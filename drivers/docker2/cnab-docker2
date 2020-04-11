@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+set -eou pipefail
+
+cat /dev/stdin | $0.py "$@" 2>&1 | tee ${DOCKER2_LOG:-docker2-log.txt}
