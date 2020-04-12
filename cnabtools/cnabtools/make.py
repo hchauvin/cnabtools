@@ -90,11 +90,11 @@ class Make:
                             help='Application name',
                             default=self.default_app_name)
         parser.add_argument('--set',
-                            nargs='*',
+                            action='append',
                             help='Set individual parameters as NAME=VALUE pairs')
         parser.add_argument('--set-file',
                             dest='set_file',
-                            nargs='*',
+                            action='append',
                             help='Set individual parameters from file content as NAME=SOURCE-PATH pairs')
         args = parser.parse_args(sys.argv[2:])
         install(self._duffle(),
@@ -111,11 +111,11 @@ class Make:
                             help='Application name',
                             default=self.default_app_name)
         parser.add_argument('--set',
-                            nargs='*',
+                            action='append',
                             help='Set individual parameters as NAME=VALUE pairs')
         parser.add_argument('--set-file',
                             dest='set_file',
-                            nargs='*',
+                            action='append',
                             help='Set individual parameters from file content as NAME=SOURCE-PATH pairs')
         args = parser.parse_args(sys.argv[2:])
         run(self._duffle(),
