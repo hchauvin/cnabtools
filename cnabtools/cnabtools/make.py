@@ -30,8 +30,8 @@ def install(duffle, skip_load, app_name, bundle_path, set, set_file):
     duffle.exec(args)
 
 
-def run(duffle, app_name, set, set_file):
-    args = ['run', '-d', 'docker2', app_name]
+def run(duffle, action, app_name, set, set_file):
+    args = ['run', '-d', 'docker2', action, app_name]
     for v in set:
         args += ['--set', v]
     for v in set_file:
@@ -107,6 +107,8 @@ class Make:
     def run(self):
         parser = argparse.ArgumentParser(
             description='Run an arbitrary CNAB action')
+        parser.add_argument('action',
+                            help='Action to run')
         parser.add_argument('--name',
                             help='Application name',
                             default=self.default_app_name)
@@ -119,6 +121,7 @@ class Make:
                             help='Set individual parameters from file content as NAME=SOURCE-PATH pairs')
         args = parser.parse_args(sys.argv[2:])
         run(self._duffle(),
+            action=args.action,
             app_name=args.name,
             set=args.set or [],
             set_file=args.set_file or [])
