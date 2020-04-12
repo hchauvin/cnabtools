@@ -10,7 +10,7 @@ import os
 import subprocess
 import sys
 import json
-from .duffle import Duffle
+from duffle import Duffle
 
 
 def install(duffle, skip_load, app_name, bundle_path, set, set_file):

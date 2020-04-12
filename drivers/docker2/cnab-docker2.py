@@ -68,9 +68,11 @@ def run(operation):
                 f.write(operation['files'][container_path])
             volumes.append(local_path + ':' + container_path + ':ro')
     if operation['outputs'] and len(operation['outputs']) > 0:
-        output_local_dir = os.environ.get("CNAB_OUTPUT_DIR")
-        assert output_local_dir, 'expected CNAB_OUTPUT_DIR to have been set'
-        volumes.append(output_local_dir + ':/cnab/app/outputs')
+        print("WARNING: 'outputs' is currently a NO-OP")
+        # FIXME: Uncomment when Duffle gets the latest version of cnab-go.
+        # output_local_dir = os.environ.get("CNAB_OUTPUT_DIR")
+        # assert output_local_dir, 'expected CNAB_OUTPUT_DIR to have been set'
+        # volumes.append(output_local_dir + ':/cnab/app/outputs')
 
     args = ['docker', 'run', '--rm']
     if config.allow_docker_host_access:
