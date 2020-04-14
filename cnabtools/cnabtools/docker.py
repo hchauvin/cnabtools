@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """
 Toolkit and Command-Line Interface to use Docker/Buildkit in a reproducible
 way.
@@ -26,7 +25,7 @@ def content_addressable_imgref(image_repository, image_id):
         image_repository: The repository to use in the image reference.
         image_id: The ID of the image.
     """
-    return image_repository + ':' + image_id[image_id.index(':')+1:][:40]
+    return image_repository + ':' + image_id[image_id.index(':') + 1:][:40]
 
 
 def _imgref_for_invocation_digest(build_context_digest):
@@ -46,6 +45,7 @@ def _imgref_for_invocation_digest(build_context_digest):
 
 
 class Docker:
+
     def __init__(self, logger_name="docker"):
         self.env = {**os.environ, "DOCKER_BUILDKIT": "1"}
 
@@ -97,7 +97,10 @@ class Docker:
         ])
         return imgref
 
-    def build_with_client_cache(self, build_context_path, iidfile=None, args=None):
+    def build_with_client_cache(self,
+                                build_context_path,
+                                iidfile=None,
+                                args=None):
         """
         Builds an image using a client cache.
 
@@ -122,7 +125,8 @@ class Docker:
         if not args:
             args = []
 
-        build_invocation_digest = self.digest_build_invocation(build_context_path, args)
+        build_invocation_digest = self.digest_build_invocation(
+            build_context_path, args)
         imgref = _imgref_for_invocation_digest(build_invocation_digest)
         image_id = self.image_id(imgref)
         if image_id:
@@ -137,21 +141,24 @@ class Docker:
             iidfile = os.path.join(tmpdir, 'iidfile')
 
         try:
-            subprocess.run(['docker', 'build',
-                            '--iidfile', iidfile] + args + [build_context_path],
-                           env=self.env,
-                           check=True)
+            subprocess.run(
+                ['docker', 'build', '--iidfile', iidfile] + args +
+                [build_context_path],
+                env=self.env,
+                check=True)
             with open(iidfile, 'r') as f:
                 iid = f.read().strip()
             subprocess.run(['docker', 'tag', iid, imgref],
-                           env=self.env, check=True)
+                           env=self.env,
+                           check=True)
         finally:
             if tmpdir:
                 shutil.rmtree(tmpdir)
 
         return iid
 
-    def digest_build_invocation(self, build_context_path,
+    def digest_build_invocation(self,
+                                build_context_path,
                                 build_invocation_args=None):
         """
         Digests an invocation to "docker build" by digesting the content
@@ -192,11 +199,11 @@ class Docker:
             The image ID, or "None" if the image could not be found in the
             buildkit cache.
         """
-        p = subprocess.run(['docker', 'inspect', imgref,
-                            '--format', '{{ .Id }}'],
-                           capture_output=True,
-                           encoding='utf8',
-                           env=self.env)
+        p = subprocess.run(
+            ['docker', 'inspect', imgref, '--format', '{{ .Id }}'],
+            capture_output=True,
+            encoding='utf8',
+            env=self.env)
         if p.returncode != 0:
             return None
         else:
@@ -261,15 +268,14 @@ class CLI:
 
     def __init__(self):
         parser = argparse.ArgumentParser(
-            description='Make',
-            usage="make <command> [<args>]")
+            description='Make', usage="make <command> [<args>]")
         subcommands = [
             attr for attr in dir(self)
             if not attr.startswith("_") and callable(getattr(self, attr))
         ]
-        parser.add_argument('command',
-                            help='Subcommand to run: one of: ' + " ".join(
-                                subcommands))
+        parser.add_argument(
+            'command',
+            help='Subcommand to run: one of: ' + " ".join(subcommands))
         args = parser.parse_args(sys.argv[1:2])
         if not hasattr(self, args.command):
             print('Unrecognized command')
@@ -282,10 +288,13 @@ class CLI:
             description='Docker build with client-side caching')
         parser.add_argument('path', help='Path to the context')
         parser.add_argument('--iidfile', help='Path to the image id file')
-        parser.add_argument('args', help='Other arguments to "docker build"',
-                            nargs=argparse.REMAINDER)
+        parser.add_argument(
+            'args',
+            help='Other arguments to "docker build"',
+            nargs=argparse.REMAINDER)
         args = parser.parse_args(sys.argv[2:])
-        Docker().build_with_client_cache(args.path, args.iidfile, args.args or [])
+        Docker().build_with_client_cache(args.path, args.iidfile, args.args or
+                                         [])
 
 
 if __name__ == "__main__":

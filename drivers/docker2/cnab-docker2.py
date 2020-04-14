@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """
 Alternative Duffle driver for Docker.
 """
@@ -28,15 +27,21 @@ def main(option):
         print(f"Unexpected option '{option}'", file=sys.stderr)
         sys.exit(1)
 
+
 class Config:
+
     def __init__(self, allow_docker_host_access=False):
         self.allow_docker_host_access = allow_docker_host_access
 
+
 def parse_config(operation):
-    custom_extension = operation.get('Bundle', {}).get('custom', {}).get('io.chauvin.docker2', {})
+    custom_extension = operation.get('Bundle',
+                                     {}).get('custom',
+                                             {}).get('io.chauvin.docker2', {})
     return Config(
-        allow_docker_host_access = custom_extension.get('allow-docker-host-access', False)
-    )
+        allow_docker_host_access=custom_extension.get(
+            'allow-docker-host-access', False))
+
 
 def run(operation):
     config = parse_config(operation)
@@ -51,6 +56,7 @@ def run(operation):
 
         def remove_files_to_mount_dir():
             shutil.rmtree(files_to_mount_dir)
+
         atexit.register(remove_files_to_mount_dir)
 
         for i, container_path in enumerate(operation['files']):
@@ -79,14 +85,13 @@ def run(operation):
         operation['action'],
     ]
 
-    subprocess.run(args, check=True, stdout=sys.stderr.buffer, stderr=sys.stderr.buffer)
+    subprocess.run(
+        args, check=True, stdout=sys.stderr.buffer, stderr=sys.stderr.buffer)
 
 
 if __name__ == "__main__":
     try:
-        main(
-            option=sys.argv[1] if len(sys.argv) >= 2 else None,
-        )
+        main(option=sys.argv[1] if len(sys.argv) >= 2 else None,)
     except KeyboardInterrupt as e:
         print("Interrupted", sys.stderr)
         sys.exit(1)

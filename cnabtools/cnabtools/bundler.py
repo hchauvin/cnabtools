@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """
 Toolkit and Command-Line Interface to build CNAB applications
 from Duffle specifications, in a more reproducible way.
@@ -48,8 +47,7 @@ class DuffleContext:
         with open(self.manifest_path, 'w') as f:
             json.dump(manifest, f)
 
-    def relocate_images_to_content_addressable(self,
-                                               image_ids):
+    def relocate_images_to_content_addressable(self, image_ids):
         """
         Adds the digests to the images in a duffle.json, and
         relocates the images to make them content-addressable (i.e., the
@@ -75,8 +73,8 @@ class DuffleContext:
             if not image_id:
                 next_images[image_name] = image
             else:
-                next_image = docker.tag_content_addressable(image['image'],
-                                                            image_id)
+                next_image = docker.tag_content_addressable(
+                    image['image'], image_id)
                 next_images[image_name] = {
                     **image,
                     "image": next_image,
@@ -116,11 +114,10 @@ class DuffleContext:
 
         cnab_invocation_images = []
         for name in duffle_manifest['invocationImages']:
-            cnab_invocation_images.append(self._build_invocation_image(
-                cnab_dir,
-                app_name,
-                name,
-                duffle_manifest['invocationImages'][name]))
+            cnab_invocation_images.append(
+                self._build_invocation_image(
+                    cnab_dir, app_name, name,
+                    duffle_manifest['invocationImages'][name]))
 
         cnab_manifest = {
             **duffle_manifest,
@@ -133,7 +130,8 @@ class DuffleContext:
 
         return cnab_manifest
 
-    def _build_invocation_image(self, cnab_dir, app_name, manifest_name, build_spec):
+    def _build_invocation_image(self, cnab_dir, app_name, manifest_name,
+                                build_spec):
         """
         Builds an invocation image.
 
@@ -152,10 +150,12 @@ class DuffleContext:
         if builder == 'docker':
             image_full_name = f"{app_name}-{manifest_name}"
             if build_spec.get('configuration', {}).get('registry'):
-                image_full_name = (build_spec['configuration']['registry'] +
-                                   '/' + image_full_name)
-            imgref, image_id = (self._docker().
-                                build_content_addressable(cnab_dir, image_full_name))
+                image_full_name = (
+                    build_spec['configuration']['registry'] + '/' +
+                    image_full_name)
+            imgref, image_id = (
+                self._docker().build_content_addressable(
+                    cnab_dir, image_full_name))
             return {
                 'image': imgref,
                 'contentDigest': image_id,
@@ -216,9 +216,11 @@ class CnabDescriptor:
             print(f"    {image}")
 
         args = [
-                   'docker', 'save',
-                   '--output', output_tarball_path,
-               ] + images
+            'docker',
+            'save',
+            '--output',
+            output_tarball_path,
+        ] + images
 
         start = time.time()
         subprocess.run(args, check=True)
@@ -255,15 +257,14 @@ class CLI:
 
     def __init__(self):
         parser = argparse.ArgumentParser(
-            description='Make',
-            usage="make <command> [<args>]")
+            description='Make', usage="make <command> [<args>]")
         subcommands = [
             attr for attr in dir(self)
             if not attr.startswith("_") and callable(getattr(self, attr))
         ]
-        parser.add_argument('command',
-                            help='Subcommand to run: one of: ' + " ".join(
-                                subcommands))
+        parser.add_argument(
+            'command',
+            help='Subcommand to run: one of: ' + " ".join(subcommands))
         args = parser.parse_args(sys.argv[1:2])
         if not hasattr(self, args.command):
             print('Unrecognized command')
@@ -272,14 +273,14 @@ class CLI:
         getattr(self, args.command)()
 
     def build(self):
-        parser = argparse.ArgumentParser(
-            description='Build a CNAB bundle')
-        parser.add_argument('path',
-                            help='Path to the duffle context')
-        parser.add_argument('-o', '--output-file',
-                            help='Path to the output bundle.json file (the ' +
-                                 'CNAB descriptor)',
-                            required=True)
+        parser = argparse.ArgumentParser(description='Build a CNAB bundle')
+        parser.add_argument('path', help='Path to the duffle context')
+        parser.add_argument(
+            '-o',
+            '--output-file',
+            help='Path to the output bundle.json file (the ' +
+            'CNAB descriptor)',
+            required=True)
         args = parser.parse_args(sys.argv[2:])
         DuffleContext(args.path).build_cnab_app(args.output_file)
 

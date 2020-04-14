@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2020 Hadrien Chauvin
-
 """
 Interacts with the Duffle native CLI.
 """
@@ -11,15 +10,17 @@ import shutil
 import urllib.request
 import platform
 
-
 #: Version of DUFFLE to download.
 DUFFLE_VERSION = '0.3.5-beta.1'
 
 #: URLs to the Duffle native binaries.
 DUFFLE_BINARY_URLS = {
-    'Darwin': f'https://github.com/cnabio/duffle/releases/download/{DUFFLE_VERSION}/duffle-darwin-amd64',
-    'Linux': f'https://github.com/cnabio/duffle/releases/download/{DUFFLE_VERSION}/duffle-linux-amd64',
-    'Windows': f'https://github.com/cnabio/duffle/releases/download/{DUFFLE_VERSION}/duffle-windows-amd64.exe',
+    'Darwin':
+        f'https://github.com/cnabio/duffle/releases/download/{DUFFLE_VERSION}/duffle-darwin-amd64',
+    'Linux':
+        f'https://github.com/cnabio/duffle/releases/download/{DUFFLE_VERSION}/duffle-linux-amd64',
+    'Windows':
+        f'https://github.com/cnabio/duffle/releases/download/{DUFFLE_VERSION}/duffle-windows-amd64.exe',
 }
 
 
@@ -54,17 +55,19 @@ class Duffle:
             self.exec(['init'])
 
     def exec(self, args):
-        subprocess.run([self.duffle_path, '--verbose'] + args,
-                       env={**os.environ,
-                            "PATH": self.driver_path +
-                                    os.pathsep +
-                                    os.environ.get("PATH", "")},
-                       check=True)
+        subprocess.run(
+            [self.duffle_path, '--verbose'] + args,
+            env={
+                **os.environ, "PATH":
+                    self.driver_path + os.pathsep + os.environ.get("PATH", "")
+            },
+            check=True)
 
     def _ensure_local_duffle(self):
         p = platform.system()
-        self.duffle_path = os.path.join(self.bundle_path,
-                                        'bin/duffle.exe' if p == 'Windows' else 'bin/duffle')
+        self.duffle_path = os.path.join(
+            self.bundle_path,
+            'bin/duffle.exe' if p == 'Windows' else 'bin/duffle')
         if not os.path.exists(self.duffle_path):
             self._install_duffle()
 
