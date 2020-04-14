@@ -50,7 +50,7 @@ def run(operation):
     if config.allow_docker_host_access:
         volumes += ['/var/run/docker.sock:/var/run/docker.sock']
     if len(operation['files']) > 0:
-        files_to_mount_dir = os.path.abspath("files")
+        files_to_mount_dir = os.path.abspath(".cnab_tmp")
         shutil.rmtree(files_to_mount_dir, ignore_errors=True)
         os.mkdir(files_to_mount_dir)
 
