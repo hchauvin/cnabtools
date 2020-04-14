@@ -148,6 +148,10 @@ def _check_docker_version():
     """
     Checks that the Docker version is high enough.
     """
+    if os.environ.get("CIRCLECI"):
+        # Skip
+        return
+
     MIN_DOCKER_VERSION =  distutils.version.StrictVersion('19.03.8')
 
     try:
