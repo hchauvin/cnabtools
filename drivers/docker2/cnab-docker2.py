@@ -55,7 +55,7 @@ def run(operation):
         os.mkdir(files_to_mount_dir)
 
         def remove_files_to_mount_dir():
-            shutil.rmtree(files_to_mount_dir)
+            shutil.rmtree(files_to_mount_dir, ignore_errors=True)
 
         atexit.register(remove_files_to_mount_dir)
 
