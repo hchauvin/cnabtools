@@ -10,6 +10,9 @@ import os
 import subprocess
 import sys
 import json
+import distutils.version
+import re
+
 from duffle import Duffle
 
 
@@ -141,8 +144,31 @@ class Make:
                       force_local=os.environ.get("FORCE_LOCAL_DUFFLE") == "1")
 
 
+def _check_docker_version():
+    """
+    Checks that the Docker version is high enough.
+    """
+    MIN_DOCKER_VERSION =  distutils.version.StrictVersion('19.03.8')
+
+    try:
+        p = subprocess.run(['docker', '--version'], capture_output=True, check=True, encoding='utf8')
+    except Exception as e:
+        raise Exception("cannot run 'docker --version'") from e
+    match = re.search(r"Docker version ((\d+)\.(\d+)\.(\d+))", p.stdout)
+    if match:
+        version = distutils.version.StrictVersion(match.group(1))
+    else:
+        raise Exception(f"cannot determine version from 'docker --version' output: <<< {p.stdout} >>>")
+
+    if version < MIN_DOCKER_VERSION:
+        raise Exception(f"minimum Docker version: {MIN_DOCKER_VERSION}; " +
+                        f"you've got {version}: please upgrade your local installation of Docker")
+
+
 if __name__ == "__main__":
     try:
+        _check_docker_version()
+
         bundle_path = os.path.dirname(os.path.realpath(__file__))
         bundle_name = os.path.basename(bundle_path)
         Make(default_app_name=bundle_name,
