@@ -22,15 +22,9 @@ def main(option):
     elif option == "--help":
         print("Alternative Duffle driver for the local Docker daemon")
     elif not option:
-        with open('output.txt', 'w') as f:
-            json.dump({"error": False}, f)
         operation = json.load(sys.stdin)
-        with open('output.txt', 'w') as f:
-            json.dump({"error": "XXX"}, f)
         run(operation)
     else:
-        with open('output.txt', 'w') as f:
-            json.dump({"error": True}, f)
         print(f"Unexpected option '{option}'", file=sys.stderr)
         sys.exit(1)
 
@@ -45,9 +39,6 @@ def parse_config(operation):
     )
 
 def run(operation):
-    with open('output.txt', 'w') as f:
-        json.dump({"error": "XXX2", "operation": operation}, f)
-
     config = parse_config(operation)
 
     volumes = []
@@ -87,9 +78,6 @@ def run(operation):
         '/cnab/app/run',
         operation['action'],
     ]
-
-    with open('output.txt', 'w') as f:
-        json.dump(args, f)
 
     subprocess.run(args, check=True, stdout=sys.stderr.buffer, stderr=sys.stderr.buffer)
 
